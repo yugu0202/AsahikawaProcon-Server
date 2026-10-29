@@ -1,5 +1,6 @@
 #include "TcpClient.h"
 #include <QSettings>
+#include <QCoreApplication>
 #include <QRegularExpression>
 #include <QFont>
 #include <QLabel>
@@ -94,6 +95,10 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data)
     client->write(QString(data.toString() + "\r\n").toUtf8());
     qDebug() << "WRM";
     qDebug() << data.toString();
+    if (QCoreApplication::arguments().contains("--headless") && data.connect == GameSystem::CONNECTING_STATUS::FINISHED) {
+        client->flush();
+        return GameSystem::Method{GameSystem::TEAM::UNKNOWN, GameSystem::Method::ACTION::UNKNOWN, GameSystem::Method::ROTE::UNKNOWN};
+    }
     //レスポンス待ち
     QString response = WaitResponce();
     if (response != QString())
@@ -121,8 +126,7 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data)
 
 bool TCPClient::OpenSocket(int Port)
 {
-    this->server->listen(QHostAddress::Any, Port);
-    return true;
+    return this->server->listen(QHostAddress::Any, Port);
 }
 
 bool TCPClient::CloseSocket()

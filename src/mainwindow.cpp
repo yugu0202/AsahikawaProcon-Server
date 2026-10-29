@@ -6,6 +6,8 @@
 #include <QAudioOutput>
 #include <QRandomGenerator>
 #include "Definition.h"
+#include <QCoreApplication>
+#include <cstdio>
 
 // staticメンバ変数 初期化
 MainWindow* MainWindow::s_instance = nullptr;
@@ -254,7 +256,7 @@ MainWindow::~MainWindow()
     s_prevMsgHandler = nullptr;
     s_instance = nullptr;
 
-    auto ret = QMessageBox::information(this, "", tr("続けてサーバーを起動しますか。"), QMessageBox::Yes, QMessageBox::No);
+    auto ret = QCoreApplication::arguments().contains("--headless") ? QMessageBox::No : QMessageBox::information(this, "", tr("続けてサーバーを起動しますか。"), QMessageBox::Yes, QMessageBox::No);
 
     delete ui;
 
@@ -491,6 +493,20 @@ void MainWindow::Finish(GameSystem::WINNER winner)
         qDebug() << board->FinishConnecting(static_cast<GameSystem::TEAM>(i)).toString();
     }
     */
+    if (QCoreApplication::arguments().contains("--headless")) {
+        for (int i = 0; i < TEAM_COUNT; ++i) {
+            if (startup->team_client[i]->client->is_disconnected) {
+                std::fprintf(stderr, "ERROR CLIENT_FAILURE %s\n", i == 0 ? "COOL" : "HOT");
+                std::fflush(stderr);
+                QCoreApplication::exit(3);
+                return;
+            }
+        }
+        const char *result = winner == GameSystem::WINNER::COOL ? "COOL" : winner == GameSystem::WINNER::HOT ? "HOT" : "DRAW";
+        std::printf("RESULT %s %d %d\n", result, ui->Field->team_score[0], ui->Field->team_score[1]);
+        std::fflush(stdout);
+        QCoreApplication::quit();
+    }
     //log.close();
 }
 
