@@ -97,3 +97,12 @@ qmake ../tests/cli.pro
 make
 CHASER_SERVER_BINARY=/absolute/path/AsahikawaProcon-Server ./cli_test
 ```
+
+### CI と CLI ビルドの配布
+
+`master` または `main` への push ごとに、テスト成功後の Linux x86_64 向け
+実行ファイルを `cli-<コミット SHA>` のプレリリースに保存します。リリースには
+`cli-linux-x86_64.tar.gz` と SHA-256 の検証ファイルが含まれます。
+Ubuntu 24.04 向けの動的リンク版であり、実行環境には Qt 6 のランタイムが必要です。
+例えば Ubuntu 24.04 では `sudo apt-get install libqt6widgets6 libqt6network6 libqt6multimedia6 qt6-qpa-plugins` で導入できます。
+別リポジトリでは、対象コミットのリリースを指定して取得し、ハッシュを確認してください。

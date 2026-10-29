@@ -48,13 +48,6 @@ jobs:
           qmake ../src/AsahikawaProcon-Server.pro "CONFIG+=release" ${{ matrix.qmake_args }}
           make -j$(nproc)
 
-          echo "CLI テストをビルドして実行"
-          mkdir cli-tests && cd cli-tests
-          qmake ../../tests/cli.pro ${{ matrix.qmake_args }}
-          make -j$(nproc)
-          CHASER_SERVER_BINARY="$(pwd)/../AsahikawaProcon-Server" ./cli_test
-          cd ..
-
           echo "Extract linuxdeployqt AppImage"
           wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-${{ matrix.arch }}.AppImage > /dev/null 2>&1
           chmod a+x linuxdeployqt-continuous-${{ matrix.arch }}.AppImage
