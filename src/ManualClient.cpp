@@ -1,5 +1,7 @@
 #include "ManualClient.h"
 #include <QEventLoop>
+#include <QGuiApplication>
+#include <QScreen>
 
 void ManualClient::closeEvent(){
     emit Disconnected();
