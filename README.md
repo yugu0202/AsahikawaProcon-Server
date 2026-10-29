@@ -72,3 +72,25 @@ Imageフォルダがない場合は新規作成してください。
 - Qt Creator 3.3.0
 - Desktop Qt 5.4.2 clang 64bit
 
+
+## 自動テスト用の起動
+
+Qt 6 でビルドした実行ファイルにマップを指定し、`--headless` を付けると、
+画面を表示せず TCP の接続待機と対戦開始を行います。
+
+```sh
+./AsahikawaProcon-Server /absolute/path/test.map --headless
+```
+
+COOL は 2009 番、HOT は 2010 番ポートで待ち受けます。両クライアントの接続と
+名前の送信後に対戦を開始します。終了時は標準出力に
+`RESULT DRAW 0 0` の形式で勝者（`COOL`、`HOT`、`DRAW`）と両者の得点を出力し、
+プロセスを終了します。ポートが使用中の場合は終了コード 2 で終了します。
+入力するマップは通常の GUI で使用できる正常なマップを用意してください。
+接続待ち時間や対戦時間の上限は呼び出し側で設定してください。
+
+自動テストは Python 3 とビルド済み実行ファイルを使って実行します。
+
+```sh
+CHASER_SERVER_BINARY=/absolute/path/AsahikawaProcon-Server python3 -m unittest discover -s tests
+```

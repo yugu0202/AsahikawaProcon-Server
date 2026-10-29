@@ -1,5 +1,7 @@
 #include "ClientSettingForm.h"
 #include "ui_ClientSettingForm.h"
+#include <QCoreApplication>
+#include <cstdlib>
 
 ClientSettingForm::ClientSettingForm(QWidget *parent) :
     QGroupBox(parent),
@@ -77,7 +79,14 @@ void ClientSettingForm::ConnectionToggled(bool state)
 {
     if(state){
         //TCP待機開始
-        dynamic_cast<TCPClient*>(this->client)->OpenSocket(ui->PortSpinBox->value());
+        if (!dynamic_cast<TCPClient*>(this->client)->OpenSocket(ui->PortSpinBox->value())) {
+            if (QCoreApplication::arguments().contains("--headless")) {
+                qCritical("TCPポートを開けません");
+                ::exit(2);
+            }
+            ui->ConnectButton->setChecked(false);
+            return;
+        }
         this->ui->ConnectButton->setText("待機終了");
         this->ui->StateLabel->setText("TCP接続待ち状態");
         this->ui->PortSpinBox->setEnabled(false);
