@@ -494,6 +494,14 @@ void MainWindow::Finish(GameSystem::WINNER winner)
     }
     */
     if (QCoreApplication::arguments().contains("--headless")) {
+        for (int i = 0; i < TEAM_COUNT; ++i) {
+            if (startup->team_client[i]->client->is_disconnected) {
+                std::fprintf(stderr, "ERROR CLIENT_FAILURE %s\n", i == 0 ? "COOL" : "HOT");
+                std::fflush(stderr);
+                QCoreApplication::exit(3);
+                return;
+            }
+        }
         const char *result = winner == GameSystem::WINNER::COOL ? "COOL" : winner == GameSystem::WINNER::HOT ? "HOT" : "DRAW";
         std::printf("RESULT %s %d %d\n", result, ui->Field->team_score[0], ui->Field->team_score[1]);
         std::fflush(stdout);

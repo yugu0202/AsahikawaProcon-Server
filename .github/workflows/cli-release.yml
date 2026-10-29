@@ -35,7 +35,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="cli-${GITHUB_SHA}"
-          gh release create "$tag" cli-linux-x86_64.tar.gz cli-linux-x86_64.tar.gz.sha256 \
-            --target "$GITHUB_SHA" --title "CLI ${GITHUB_SHA}" \
-            --notes "Ubuntu 24.04 x86_64 向け CLI ビルドです。実行には Qt 6 のランタイムが必要です。" \
-            --prerelease --latest=false
+          if gh release view "$tag" --json isDraft --jq .isDraft > release-state.txt 2>/dev/null; then
+            if [ "$(cat release-state.txt)" != true ]; then
+              echo "公開済みリリースは変更しません: $tag"
+              exit 0
+            fi
+          else
+            gh release create "$tag" --draft --target "$GITHUB_SHA" --title "CLI ${GITHUB_SHA}" \
+              --notes "Ubuntu 24.04 x86_64 向け CLI ビルドです。実行には Qt 6 のランタイムが必要です。" \
+              --prerelease --latest=false
+          fi
+          gh release upload "$tag" cli-linux-x86_64.tar.gz cli-linux-x86_64.tar.gz.sha256 --clobber
+          gh release edit "$tag" --draft=false
