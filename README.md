@@ -89,8 +89,11 @@ COOL は 2009 番、HOT は 2010 番ポートで待ち受けます。両クラ�
 入力するマップは通常の GUI で使用できる正常なマップを用意してください。
 接続待ち時間や対戦時間の上限は呼び出し側で設定してください。
 
-自動テストは Python 3 とビルド済み実行ファイルを使って実行します。
+自動テストは Qt Test とビルド済み実行ファイルを使って実行します。
 
 ```sh
-CHASER_SERVER_BINARY=/absolute/path/AsahikawaProcon-Server python3 -m unittest discover -s tests
+mkdir -p build-tests && cd build-tests
+qmake ../tests/cli.pro
+make
+CHASER_SERVER_BINARY=/absolute/path/AsahikawaProcon-Server ./cli_test
 ```
